@@ -3,7 +3,8 @@ package mp3
 
 /*
 #include <mpg123.h>
-#cgo LDFLAGS: -lmpg123
+#cgo CFLAGS: -I/usr/local/include
+#cgo LDFLAGS: -L/usr/local/lib -lmpg123
 */
 import "C"
 
@@ -45,13 +46,13 @@ func NewDecoder(r io.Reader) (*Decoder, error) {
 }
 
 // NewDecoderMonoInt16 is a handy helper for us.
-func NewDecoderMonoInt16(r io.Reader, fps int) (*Decoder, error) {
+func NewDecoderMonoInt16(r io.Reader, fps C.long) (*Decoder, error) {
 	return NewDecoderCustom(r, fps, C.MPG123_MONO, C.MPG123_ENC_SIGNED_16)
 }
 
 // NewDecoderCustom is the no-nonsense function that other ones alias to.
 func NewDecoderCustom(
-	r io.Reader, fps int, channelMode int, encoding int,
+	r io.Reader, fps C.long, channelMode C.int, encoding C.int,
 ) (*Decoder, error) {
 	var e C.int
 	mh := C.mpg123_new(nil, &e)
@@ -62,13 +63,6 @@ func NewDecoderCustom(
 	err := toError(C.mpg123_open_feed(mh))
 	if err != nil {
 		return nil, err
-	}
-
-	var channelMode int
-	if isMono {
-		channelMode = C.MPG12_MONO
-	} else {
-		channelMode = C.MPG12_STEREO
 	}
 
 	C.mpg123_format_none(mh)
