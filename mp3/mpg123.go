@@ -41,6 +41,18 @@ func toError(e C.int) error {
 // The Close method should be called when finished with the decoder so as to
 // not leak resources.
 func NewDecoder(r io.Reader) (*Decoder, error) {
+	return NewDecoderCustom(r, 44100, C.MPG123_STEREO, C.MPG123_ENC_FLOAT_32)
+}
+
+// NewDecoderMonoInt16 is a handy helper for us.
+func NewDecoderMonoInt16(r io.Reader, fps int) (*Decoder, error) {
+	return NewDecoderCustom(r, fps, C.MPG123_MONO, C.MPG123_ENC_SIGNED_16)
+}
+
+// NewDecoderCustom is the no-nonsense function that other ones alias to.
+func NewDecoderCustom(
+	r io.Reader, fps int, channelMode int, encoding int,
+) (*Decoder, error) {
 	var e C.int
 	mh := C.mpg123_new(nil, &e)
 	if mh == nil || e != 0 {
@@ -52,8 +64,15 @@ func NewDecoder(r io.Reader) (*Decoder, error) {
 		return nil, err
 	}
 
+	var channelMode int
+	if isMono {
+		channelMode = C.MPG12_MONO
+	} else {
+		channelMode = C.MPG12_STEREO
+	}
+
 	C.mpg123_format_none(mh)
-	C.mpg123_format(mh, 44100, C.MPG123_STEREO, C.MPG123_ENC_FLOAT_32)
+	C.mpg123_format(mh, fps, channelMode, encoding)
 
 	buf := make([]byte, ReadBufferSize)
 	return &Decoder{mh: mh, src: r, buf: buf}, nil
