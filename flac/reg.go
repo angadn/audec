@@ -3,7 +3,7 @@ package flac
 import (
 	"io"
 
-	"github.com/Wessie/audec"
+	"github.com/angadn/audec"
 )
 
 func AudecDecoder(r io.Reader) (audec.Decoder, error) {
