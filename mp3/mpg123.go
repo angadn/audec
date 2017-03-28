@@ -109,13 +109,16 @@ func (d *Decoder) Read(p []byte) (n int, err error) {
 	var stat C.int
 loop:
 	for {
+		log.Print("Bp1")
 		var rn int
 		rn, err = d.src.Read(d.buf)
+		log.Print("Bp2")
 		if err != nil && err != io.EOF {
 			return n, err
 		}
 
 		var cn C.size_t
+		log.Print("Bp3")
 		stat = C.mpg123_decode(d.mh,
 			(*C.uchar)(unsafe.Pointer(&d.buf[0])), C.size_t(rn),
 			(*C.uchar)(unsafe.Pointer(&p[n])), C.size_t(len(p)-n),
@@ -126,9 +129,11 @@ loop:
 
 		switch stat {
 		case C.MPG123_NEED_MORE:
+			log.Print("Bp4")
 			// mpg123 is asking for more data, so loop around if
 			// we haven't reached EOF in the reader yet.
 			if err == io.EOF {
+				log.Print("Bp5")
 				// We've exhausted the io.Reader and cleaned all
 				// the internal buffers of mpg123, so we can signal
 				// a proper EOF to our caller.
@@ -137,6 +142,7 @@ loop:
 			// Otherwise we just want more data
 			break
 		case C.MPG123_NEW_FORMAT:
+			log.Print("Bp6")
 			// mpg123 is notifying us of a new format coming up
 			var rate C.long
 			var chans, enc C.int
@@ -146,18 +152,23 @@ loop:
 			}
 			fallthrough
 		default:
+			log.Print("Bp7")
 			break loop
 		}
 	}
 
+	log.Print("Bp8")
 	// Check for read error from the src
 	if err != nil && err != io.EOF {
+		log.Print("Bp9")
 		return n, err
 	}
 
 	if stat != C.MPG123_OK && stat != C.MPG123_NEW_FORMAT {
+		log.Print("Bp10")
 		return n, toError(stat)
 	}
 
+	log.Print("Bp11")
 	return n, nil
 }
