@@ -45,9 +45,9 @@ func NewDecoder(r io.Reader) (*Decoder, error) {
 	return NewDecoderCustom(r, 44100, C.MPG123_STEREO, C.MPG123_ENC_FLOAT_32)
 }
 
-// NewDecoderMonoPCM16 is a handy helper for us.
-func NewDecoderMonoPCM16(r io.Reader, fps int) (*Decoder, error) {
-	return NewDecoderCustom(r, C.long(fps), C.MPG123_MONO, C.MPG123_ENC_SIGNED_16)
+// NewDecoderMono is a handy helper for us.
+func NewDecoderMono(r io.Reader, fps int) (*Decoder, error) {
+	return NewDecoderCustom(r, C.long(fps), C.MPG123_MONO, C.MPG123_ENC_FLOAT_32)
 }
 
 // NewDecoderCustom is the no-nonsense function that other ones alias to.
