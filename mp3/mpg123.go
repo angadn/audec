@@ -123,6 +123,7 @@ loop:
 		)
 
 		n += int(cn)
+		log.Printf("mpg123 wrote %d bytes", cn)
 
 		switch stat {
 		case C.MPG123_ERR:
