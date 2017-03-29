@@ -65,8 +65,8 @@ func NewDecoderCustom(
 		return nil, err
 	}
 
-	C.mpg123_format_none(mh)
-	C.mpg123_format(mh, fps, channelMode, encoding)
+	// C.mpg123_format_none(mh)
+	// C.mpg123_format(mh, fps, channelMode, encoding)
 
 	buf := make([]byte, ReadBufferSize)
 	return &Decoder{mh: mh, src: r, buf: buf}, nil
