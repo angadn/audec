@@ -19,7 +19,7 @@ import (
 var initError error
 
 // ReadBufferSize is the size of the internal buffer used by the decoder.
-var ReadBufferSize int = 64 * 1024
+var ReadBufferSize int = 4 * 1024
 
 func init() {
 	initError = toError(C.mpg123_init())
@@ -125,6 +125,9 @@ loop:
 		n += int(cn)
 
 		switch stat {
+		case C.MPG123_ERR:
+			// mpg123 hit an error
+			log.Print(errors.New(C.GoString(C.mpg123_strerror(d.mh))))
 		case C.MPG123_NEED_MORE:
 			// mpg123 is asking for more data, so loop around if
 			// we haven't reached EOF in the reader yet.
